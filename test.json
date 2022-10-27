@@ -1,0 +1,9 @@
+{
+  "device_name": "GenFrame#1",
+  "wifi_ssid": "Stone Mesh",
+  "wifi_psk": "0907336635",
+  "mqtt_url": "",
+  "mqtt_port": 0,
+  "fa_channel": "",
+  "fd_channel": ""
+}
