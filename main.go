@@ -30,14 +30,13 @@ func main() {
 		errChan <- err
 	}
 	defer cancel()
-	chrome.OpenUrl("http://localhost")
+	chrome.OpenHtml()
 	handler := handler.ProvideHandler(chrome, cfg, w)
 
 	bluetoothptl := bluetooth.ProvideBluetooth(cfg, handler)
 	if err := bluetoothptl.Start(); err != nil {
 		errChan <- err
 	}
-
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 

@@ -61,6 +61,7 @@ func (h *Handler) OnData(data []byte) (domain.CommandType, []byte, error) {
 	case domain.CommandTypeSetup:
 		resp, err := h.setup(msg)
 		if err != nil {
+			h.Chrome.Toast(err.Error())
 			return cmdType, nil, err
 		}
 		return cmdType, resp, nil
@@ -96,14 +97,13 @@ func (h *Handler) setup(msg []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("process cmd setup %+v\n", setupCmd)
-	// TODO init wifi
-	connectOutput, err := h.Wifi.Connect(setupCmd.WifiSsid, setupCmd.WifiPsk)
+	_, err = h.Wifi.Connect(setupCmd.WifiSsid, setupCmd.WifiPsk)
 	if err != nil {
-		return nil, errors.New("incorrect ssid/psk")
+		err := errors.New("incorrect ssid/psk")
+		h.Chrome.Toast(err.Error())
+		return nil, err
 	}
-	fmt.Println("Connected", string(connectOutput))
-
+	h.Chrome.Toast(fmt.Sprintf("Connect wifi %s success", setupCmd.WifiSsid))
 	// Save config
 	h.Config.WifiSsid = setupCmd.WifiSsid
 	h.Config.WifiPsk = setupCmd.WifiPsk

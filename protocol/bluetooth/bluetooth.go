@@ -40,25 +40,12 @@ func ProvideBluetooth(c *config.Config, h *handler.Handler) *Bluetooth {
 }
 
 func (b *Bluetooth) Start() error {
-	fmt.Println("start bluetooth")
 	adapter := tinybl.DefaultAdapter
-	// set connect handler
-	adapter.SetConnectHandler(func(device tinybl.Addresser, connected bool) {
-		if connected {
-			fmt.Println("connected, not advertising...")
-			b.AdvertisementState = false
-		} else {
-			fmt.Println("disconnected, advertising...")
-			b.AdvertisementState = true
-		}
-	})
-
 	if err := adapter.Enable(); err != nil {
 		return err
 	}
 	b.Adapter = adapter
 	adv := adapter.DefaultAdvertisement()
-
 	if err := adv.Configure(tinybl.AdvertisementOptions{
 		LocalName:    b.Config.DeviceName, // Nordic UART Service
 		ServiceUUIDs: []tinybl.UUID{serviceUUID},
@@ -69,7 +56,6 @@ func (b *Bluetooth) Start() error {
 	if err := adv.Start(); err != nil {
 		return err
 	}
-
 	if err := adapter.AddService(&tinybl.Service{
 		UUID: serviceUUID,
 		Characteristics: []tinybl.CharacteristicConfig{
@@ -106,7 +92,6 @@ func (b *Bluetooth) Start() error {
 	}); err != nil {
 		return err
 	}
-
 	return nil
 }
 
