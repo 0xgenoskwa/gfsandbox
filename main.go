@@ -30,7 +30,7 @@ func main() {
 		errChan <- err
 	}
 	defer cancel()
-	// chrome.OpenUrl("http://localhost")
+	chrome.OpenUrl("http://localhost")
 	handler := handler.ProvideHandler(chrome, cfg, w)
 
 	bluetoothptl := bluetooth.ProvideBluetooth(cfg, handler)

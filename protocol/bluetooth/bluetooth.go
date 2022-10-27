@@ -3,6 +3,7 @@ package bluetooth
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/0xgenoskwa/gfsandbox/config"
@@ -78,7 +79,7 @@ func (b *Bluetooth) Start() error {
 				Flags:  tinybl.CharacteristicWritePermission | tinybl.CharacteristicWriteWithoutResponsePermission,
 				WriteEvent: func(client tinybl.Connection, offset int, value []byte) {
 					fmt.Println("onreceive data", string(value))
-					resp, err := b.Handler.OnData(value)
+					cmdType, resp, err := b.Handler.OnData(value)
 					if err != nil {
 						respErr := domain.ErrorResponse{
 							Data:  value,
@@ -88,7 +89,11 @@ func (b *Bluetooth) Start() error {
 						b.TxChar.Write(bytes)
 					}
 					if resp != nil {
-						b.TxChar.Write(resp)
+						cmdTypeStr := strconv.Itoa(int(cmdType))
+						msg := []byte(cmdTypeStr)
+						msg = append(msg, []byte(":")...)
+						msg = append(msg, resp...)
+						b.TxChar.Write(msg)
 					}
 				},
 			},

@@ -1,11 +1,11 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/0xgenoskwa/gfsandbox/chrome"
 	"github.com/0xgenoskwa/gfsandbox/config"
@@ -39,28 +39,39 @@ func byteToInt(bytes []byte) int {
 	return result
 }
 
-func (h *Handler) OnData(data []byte) ([]byte, error) {
-	dataStr := string(data)
-	dataParts := strings.Split(dataStr, ":")
-	firstNumber, err := strconv.Atoi(dataParts[0])
+func (h *Handler) OnData(data []byte) (domain.CommandType, []byte, error) {
+	parts := bytes.Split(data, []byte(":"))
+	firstNumber, err := strconv.Atoi(string(parts[0]))
 	if err != nil {
-		return nil, err
+		return -1, nil, err
 	}
 	cmdType := domain.CommandType(firstNumber)
 	var msg []byte
-	if len(dataParts) > 0 {
-		msg = []byte(strings.Join(dataParts[1:], ":"))
+	if len(parts) > 1 {
+		msg = bytes.Join(parts[1:], []byte(":"))
 	}
 
 	switch cmdType {
 	case domain.CommandTypeInformation:
-		return h.getInformation()
+		resp, err := h.getInformation()
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
 	case domain.CommandTypeSetup:
-		return h.setup(msg)
+		resp, err := h.setup(msg)
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
 	case domain.CommandTypeOpenUrl:
-		return h.openUrl(msg)
+		resp, err := h.openUrl(msg)
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
 	default:
-		return nil, errors.New("unknown cmd")
+		return -1, nil, errors.New("unknown cmd")
 	}
 }
 
