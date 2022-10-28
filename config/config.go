@@ -2,16 +2,17 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 )
 
 var Version string
+var Build string
 
 type Config struct {
 	Path    string `json:"-"`
 	Version string `json:"-"`
+	Build   string `json:"-"`
 
 	DeviceName string `json:"device_name"`
 	WifiSsid   string `json:"wifi_ssid"`
@@ -26,16 +27,21 @@ func ProvideConfig() *Config {
 	return &Config{
 		Path:    "config.json",
 		Version: Version,
+		Build:   Build,
 	}
 }
 
 func (c *Config) LoadConfig() error {
+	if _, err := os.Stat(c.Path); os.IsNotExist(err) {
+		if err := c.SaveConfig(); err != nil {
+			return err
+		}
+	}
 	jsonFile, err := os.Open(c.Path)
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		return err
 	}
-	fmt.Println("loaded config.json")
 	// defer the closing of our jsonFile so that we can parse it later on
 	defer jsonFile.Close()
 

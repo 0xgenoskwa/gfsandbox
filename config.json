@@ -1,7 +1,7 @@
 {
-  "device_name": "GenFrame#1",
-  "wifi_ssid": "Autonomous",
-  "wifi_psk": "@11235813",
+  "device_name": "Genframe#0e9d",
+  "wifi_ssid": "",
+  "wifi_psk": "",
   "mqtt_url": "",
   "mqtt_port": 0,
   "fa_channel": "",
