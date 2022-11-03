@@ -2,8 +2,12 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
+	"strings"
+
+	"go.genframe.xyz/pkg/system"
 )
 
 var Version string
@@ -56,6 +60,14 @@ func (c *Config) LoadConfig() error {
 }
 
 func (c *Config) SaveConfig() error {
+	if c.DeviceName == "" {
+		macAddr, err := system.GetWirelessMacAddr()
+		if err != nil {
+			panic(err)
+		}
+		deviceName := fmt.Sprintf("Genframe#%s", strings.Replace(macAddr[len(macAddr)-5:], ":", "", -1))
+		c.DeviceName = deviceName
+	}
 	file, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		return err

@@ -6,6 +6,7 @@ const (
 	CommandTypeInformation CommandType = iota
 	CommandTypeSetup
 	CommandTypeOpenUrl
+	CommandTypeSendTouchEvent
 )
 
 type CommandInformationResponse struct {
@@ -37,6 +38,20 @@ type CommandOpenUrl struct {
 }
 
 type CommandOpenUrlResponse struct {
+	Result bool `json:"result"`
+}
+
+type CommandSendTouchEvent struct {
+	AltKey         bool    `json:"altKey"`
+	ChangedTouches []Touch `json:"changedTouches"`
+	CtrlKey        bool    `json:"ctrlKey"`
+	MetaKey        bool    `json:"metaKey"`
+	ShiftKey       bool    `json:"shiftKey"`
+	TargetTouches  []Touch `json:"targetTouches"`
+	Touches        []Touch `json:"touches"`
+}
+
+type CommandSendTouchEventResponse struct {
 	Result bool `json:"result"`
 }
 

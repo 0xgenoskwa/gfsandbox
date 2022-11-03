@@ -1,4 +1,12 @@
 {
     "editor.formatOnPaste": true,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "go.toolsEnvVars": {
+        "GOOS": "linux",
+        "GOARCH": "amd64"
+    },
+    "go.buildFlags": [
+        "-tags=wireinject"
+    ],
+    "go.testTags": "wireinject",
 }
