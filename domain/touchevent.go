@@ -14,3 +14,13 @@ type Touch struct {
 	RorationAngle float64     `json:"rorationAgle"`
 	Force         float64     `json:"force"`
 }
+
+type TouchEvent struct {
+	AltKey         bool    `json:"altKey"`
+	ChangedTouches []Touch `json:"changedTouches"`
+	CtrlKey        bool    `json:"ctrlKey"`
+	MetaKey        bool    `json:"metaKey"`
+	ShiftKey       bool    `json:"shiftKey"`
+	TargetTouches  []Touch `json:"targetTouches"`
+	Touches        []Touch `json:"touches"`
+}

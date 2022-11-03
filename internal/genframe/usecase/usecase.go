@@ -85,3 +85,17 @@ func (u *Usecase) OpenUrl(msg []byte) ([]byte, error) {
 
 	return nil, nil
 }
+
+func (u *Usecase) SendTouchEvent(msg []byte) ([]byte, error) {
+	var stCmd domain.CommandSendTouchEvent
+	err := json.Unmarshal(msg, &stCmd)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("process cmd send touch event %+v\n", stCmd)
+	if err := u.Chrome.SendTouchEvent(stCmd.Event, stCmd.Data); err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}

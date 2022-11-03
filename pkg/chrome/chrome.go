@@ -138,12 +138,5 @@ func (c *Chrome) SendTouchEvent(event string, value domain.TouchEvent) error {
 	if err != nil {
 		return err
 	}
-	go func() {
-		time.Sleep(8 * time.Second)
-		chromedp.Run(c.Context, chromedp.Tasks{
-			chromedp.SetJavascriptAttribute("#notification-content", "textContent", text, chromedp.ByQuery),
-			chromedp.SetAttributeValue("#notification", "style", "display: none", chromedp.ByID),
-		})
-	}()
 	return nil
 }
