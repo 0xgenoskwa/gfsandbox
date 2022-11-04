@@ -34,21 +34,21 @@ type Mqtt struct {
 func ProvideMQTT(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) *Mqtt {
 	m := Mqtt{}
 
-	fmt.Printf("\n\n%s:%d\n\n", c.MqttUrl, c.MqttPort)
-
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("%s:%d", c.MqttUrl, c.MqttPort))
+	mqttUri := fmt.Sprintf("%s:%d", c.MqttUrl, c.MqttPort)
+	fmt.Printf("\n\n%s:%d\n\n", c.MqttUrl, c.MqttPort)
+	fmt.Println(mqttUri)
+	opts.AddBroker(mqttUri)
 	opts.SetClientID(c.DeviceName)
 	opts.SetDefaultPublishHandler(m.onReceiveMessage)
 	opts.OnConnect = m.ConnectHandler
 	opts.OnConnectionLost = m.ConnectLostHandler
 
 	client := mqtt.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
+	m.Client = client
+	if token := m.Client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-
-	m.Client = client
 
 	return &m
 }
@@ -121,7 +121,7 @@ func (m Mqtt) onReceiveMessage(client mqtt.Client, msg mqtt.Message) {
 }
 
 func (m *Mqtt) ConnectHandler(client mqtt.Client) {
-	fmt.Println("Connected")
+	fmt.Println("Connected", m.Client, m.Config.FdChannel)
 
 	if token := m.Client.Subscribe(m.Config.FdChannel, 0, m.onReceiveMessage); token.Wait() && token.Error() != nil {
 		m.notify <- token.Error()
