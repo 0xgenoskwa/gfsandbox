@@ -9,6 +9,7 @@ import (
 
 	"go.genframe.xyz/config"
 	"go.genframe.xyz/internal/genframe/controller/bluetooth"
+	"go.genframe.xyz/internal/genframe/controller/mqtt"
 	"go.genframe.xyz/internal/genframe/usecase"
 	"go.genframe.xyz/pkg/chrome"
 	"go.genframe.xyz/pkg/wifi"
@@ -23,17 +24,19 @@ type Genframe struct {
 	//
 	Usecase          *usecase.Usecase
 	BluetoothHandler *bluetooth.Bluetooth
+	MqttHandler      *mqtt.Mqtt
 
 	notify chan error
 }
 
-func ProvideGenframe(c *config.Config, w *wifi.Wifi, chr *chrome.Chrome, u *usecase.Usecase, b *bluetooth.Bluetooth) *Genframe {
+func ProvideGenframe(c *config.Config, w *wifi.Wifi, chr *chrome.Chrome, u *usecase.Usecase, b *bluetooth.Bluetooth, m *mqtt.Mqtt) *Genframe {
 	return &Genframe{
 		Config:           c,
 		Wifi:             w,
 		Chrome:           chr,
 		Usecase:          u,
 		BluetoothHandler: b,
+		MqttHandler:      m,
 		notify:           make(chan error, 1),
 	}
 }
@@ -61,8 +64,8 @@ func (g *Genframe) Run() {
 		fmt.Println("app - Run - signal: " + s.String())
 	case err = <-g.BluetoothHandler.Notify():
 		fmt.Println(fmt.Errorf("app - Run - g.BluetoothHandler.Notify: %w", err))
-		// case err = <-rmqServer.Notify():
-		// 	fmt.Println(fmt.Errorf("app - Run - rmqServer.Notify: %w", err))
+	case err = <-g.MqttHandler.Notify():
+		fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Notify: %w", err))
 	}
 
 	if err := g.BluetoothHandler.Shutdown(); err != nil {

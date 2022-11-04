@@ -1,14 +1,17 @@
 package mqtt
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 
-	"github.com/0xgenoskwa/gfsandbox/config"
-	"github.com/0xgenoskwa/gfsandbox/domain"
-	"github.com/0xgenoskwa/gfsandbox/handler"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"go.genframe.xyz/config"
+	"go.genframe.xyz/domain"
+	"go.genframe.xyz/internal/genframe/usecase"
+	"go.genframe.xyz/pkg/chrome"
 )
 
 type MqttMessage struct {
@@ -18,70 +21,107 @@ type MqttMessage struct {
 	Topic   string
 }
 
-type MqttClient struct {
-	Port     int
-	Broker   string
-	ClientID string
-	UserName string
-	Password string
-	CMessage chan *MqttMessage
-	CError   chan error
-	Client   mqtt.Client
-	Handler  *handler.Handler
-	Config   *config.Config
+type Mqtt struct {
+	Config *config.Config
+
+	Usecase *usecase.Usecase
+	Chrome  *chrome.Chrome
+	Client  mqtt.Client
+
+	notify chan error
 }
 
-func NewMqttClient() MqttClient {
-	client := MqttClient{}
-	client.Broker = "mqtt.dev.generative.xyz"
-	client.Port = 1883
-	client.ClientID = "go_mqtt_client"
-	client.CError = make(chan error)
-	client.CMessage = make(chan *MqttMessage)
+func ProvideMQTT(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) *Mqtt {
+	m := Mqtt{}
 
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("mqtt://%s:%d", client.Broker, client.Port))
-	opts.SetClientID(client.ClientID)
+	opts.AddBroker(fmt.Sprintf("mqtt://%s:%d", c.MqttUrl, c.MqttPort))
+	opts.SetClientID(c.DeviceName)
+	opts.SetDefaultPublishHandler(m.MessagePubHandler)
+	opts.OnConnect = m.ConnectHandler
+	opts.OnConnectionLost = m.ConnectLostHandler
+	m.Client = mqtt.NewClient(opts)
 
-	opts.SetDefaultPublishHandler(client.MessagePubHandler)
-	opts.OnConnect = client.ConnectHandler
-	opts.OnConnectionLost = client.ConnectLostHandler
-	client.Client = mqtt.NewClient(opts)
-	return client
+	return &m
 }
 
-func (c MqttClient) MessagePubHandler(client mqtt.Client, msg mqtt.Message) {
+func (m *Mqtt) onData(data []byte) (domain.CommandType, []byte, error) {
+	parts := bytes.Split(data, []byte(":"))
+	firstNumber, err := strconv.Atoi(string(parts[0]))
+	if err != nil {
+		return -1, nil, err
+	}
+	cmdType := domain.CommandType(firstNumber)
+	var msg []byte
+	if len(parts) > 1 {
+		msg = bytes.Join(parts[1:], []byte(":"))
+	}
+
+	switch cmdType {
+	case domain.CommandTypeInformation:
+		resp, err := m.Usecase.GetInformation()
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
+	case domain.CommandTypeSetup:
+		resp, err := m.Usecase.Setup(msg)
+		if err != nil {
+			m.Chrome.Toast(err.Error())
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
+	case domain.CommandTypeOpenUrl:
+		resp, err := m.Usecase.OpenUrl(msg)
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
+	case domain.CommandTypeSendTouchEvent:
+		resp, err := m.Usecase.SendTouchEvent(msg)
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
+	default:
+		return -1, nil, errors.New("unknown cmd")
+	}
+}
+
+func (m Mqtt) MessagePubHandler(client mqtt.Client, msg mqtt.Message) {
 	b := []byte(msg.Payload())
-	cmdType, resp, err := c.Handler.OnData(b)
+	cmdType, resp, err := m.onData(b)
+	cmdTypeStr := strconv.Itoa(int(cmdType))
 	if err != nil {
 		respErr := domain.ErrorResponse{
 			Data:  msg.Payload(),
 			Error: err.Error(),
 		}
 		bytes, _ := json.Marshal(respErr)
-		fmt.Println("err data", bytes)
+		msg := []byte(cmdTypeStr)
+		msg = append(msg, []byte(":")...)
+		msg = append(msg, bytes...)
+		fmt.Println("err data", string(msg))
 	}
 	if resp != nil {
 		cmdTypeStr := strconv.Itoa(int(cmdType))
 		msg := []byte(cmdTypeStr)
 		msg = append(msg, []byte(":")...)
 		msg = append(msg, resp...)
-		fmt.Println("err data", msg)
-
+		fmt.Println("err data", string(msg))
 	}
-
 }
 
-func (c MqttClient) ConnectHandler(client mqtt.Client) {
+func (m *Mqtt) ConnectHandler(client mqtt.Client) {
 	fmt.Println("Connected")
 }
 
-func (c MqttClient) ConnectLostHandler(client mqtt.Client, err error) {
+func (m *Mqtt) ConnectLostHandler(client mqtt.Client, err error) {
 	fmt.Printf("Connect lost: %v", err)
 }
 
-func (c MqttClient) Connect() error {
-	token := c.Client.Connect()
+func (m *Mqtt) Connect() error {
+	token := m.Client.Connect()
 	token.Wait()
 	err := token.Error()
 	if err != nil {
@@ -90,15 +130,19 @@ func (c MqttClient) Connect() error {
 	return nil
 }
 
-func (c MqttClient) Sub(topic string) {
-	token := c.Client.Subscribe(topic, 1, nil)
+func (m *Mqtt) Sub(topic string) {
+	token := m.Client.Subscribe(topic, 1, nil)
 	token.Wait()
 	fmt.Printf("Subscribed to topic %s", topic)
 }
 
-func ProvideMQTT(c *config.Config, h *handler.Handler) *MqttClient {
-	return &MqttClient{
-		Config:  c,
-		Handler: h,
-	}
+// Notify -.
+func (m *Mqtt) Notify() <-chan error {
+	return m.notify
+}
+
+// Shutdown -.
+func (m *Mqtt) Shutdown() error {
+	m.Client.Disconnect(1000)
+	return nil
 }

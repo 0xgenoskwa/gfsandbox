@@ -9,6 +9,7 @@ package genframe
 import (
 	"go.genframe.xyz/config"
 	"go.genframe.xyz/internal/genframe/controller/bluetooth"
+	"go.genframe.xyz/internal/genframe/controller/mqtt"
 	"go.genframe.xyz/internal/genframe/usecase"
 	"go.genframe.xyz/pkg/chrome"
 	"go.genframe.xyz/pkg/wifi"
@@ -22,6 +23,7 @@ func InitializeGenframe() *Genframe {
 	chromeChrome := chrome.ProvideChrome()
 	usecaseUsecase := usecase.ProvideUsecase(chromeChrome, configConfig, wifiWifi)
 	bluetoothBluetooth := bluetooth.ProvideBluetooth(configConfig, usecaseUsecase, chromeChrome)
-	genframe := ProvideGenframe(configConfig, wifiWifi, chromeChrome, usecaseUsecase, bluetoothBluetooth)
+	mqttMqtt := mqtt.ProvideMQTT(configConfig, usecaseUsecase, chromeChrome)
+	genframe := ProvideGenframe(configConfig, wifiWifi, chromeChrome, usecaseUsecase, bluetoothBluetooth, mqttMqtt)
 	return genframe
 }

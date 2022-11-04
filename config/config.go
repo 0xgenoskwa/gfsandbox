@@ -22,7 +22,7 @@ type Config struct {
 	WifiSsid   string `json:"wifi_ssid"`
 	WifiPsk    string `json:"wifi_psk"`
 	MqttUrl    string `json:"mqtt_url"`
-	MqttPort   int8   `json:"mqtt_port"`
+	MqttPort   int    `json:"mqtt_port"`
 	FaChannel  string `json:"fa_channel"`
 	FdChannel  string `json:"fd_channel"`
 }
@@ -67,6 +67,8 @@ func (c *Config) SaveConfig() error {
 		}
 		deviceName := fmt.Sprintf("Genframe#%s", strings.Replace(macAddr[len(macAddr)-5:], ":", "", -1))
 		c.DeviceName = deviceName
+		c.MqttUrl = "mqtt://mqtt.dev.generative.xyz"
+		c.MqttPort = 1883
 	}
 	file, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {

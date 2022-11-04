@@ -24,7 +24,7 @@ type CommandSetup struct {
 	WifiSsid  string `json:"wifi_ssid"`
 	WifiPsk   string `json:"wifi_psk"`
 	MqttUrl   string `json:"mqtt_url"`
-	MqttPort  int8   `json:"mqtt_port"`
+	MqttPort  int    `json:"mqtt_port"`
 	FaChannel string `json:"fa_channel"`
 	FdChannel string `json:"fd_channel"`
 }

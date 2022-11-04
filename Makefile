@@ -20,13 +20,13 @@ generate:
 
 # Builds the project
 build-genframe:
-	GOOS=linux GOARCH=amd64 go build ${GENFRAME_LDFLAGS} -o ${BINARY} cmd/genframe/main.go
+	GOOS=linux GOARCH=amd64 go build ${GENFRAME_LDFLAGS} -o ${BINARY}-v${GENFRAME_VERSION} cmd/genframe/main.go
 
 build-autoupdater:
-	GOOS=linux GOARCH=amd64 go build ${AUTOUPDAER_LDFLAGS} -o ${BINARY} cmd/genframe/main.go
+	GOOS=linux GOARCH=amd64 go build ${AUTOUPDAER_LDFLAGS} -o ${BINARY}-v${AUTOUPDATER_VERSION} cmd/autoupdater/main.go
 
 build-autorecover:
-	GOOS=linux GOARCH=amd64 go build ${AUTORECOVER_LDFLAGS} -o ${BINARY} cmd/genframe/main.go
+	GOOS=linux GOARCH=amd64 go build ${AUTORECOVER_LDFLAGS} -o ${BINARY}-v${AUTORECOVER_VERSION} cmd/autorecover/main.go
 
 test:
 	go test ./...  -count=1 -cover -race
