@@ -1,1 +1,9 @@
-{}
+{
+  "device_name": "Genframe#0e9d",
+  "wifi_ssid": "",
+  "wifi_psk": "",
+  "mqtt_url": "mqtt://mqtt.dev.generative.xyz",
+  "mqtt_port": 1883,
+  "fa_channel": "topic/test",
+  "fd_channel": "topic/test"
+}

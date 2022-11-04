@@ -95,6 +95,7 @@ func (b *Bluetooth) onData(data []byte) (domain.CommandType, []byte, error) {
 }
 
 func (b *Bluetooth) Start() {
+	fmt.Print("start", b.Config)
 	adapter := tinybl.DefaultAdapter
 	if err := adapter.Enable(); err != nil {
 		b.notify <- err

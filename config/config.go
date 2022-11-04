@@ -28,11 +28,16 @@ type Config struct {
 }
 
 func ProvideConfig() *Config {
-	return &Config{
+	c := Config{
 		Path:    "config.json",
 		Version: Version,
 		Build:   Build,
 	}
+	if err := c.LoadConfig(); err != nil {
+		panic(err)
+	}
+
+	return &c
 }
 
 func (c *Config) LoadConfig() error {

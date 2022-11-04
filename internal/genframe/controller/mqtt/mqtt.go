@@ -34,13 +34,21 @@ type Mqtt struct {
 func ProvideMQTT(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) *Mqtt {
 	m := Mqtt{}
 
+	fmt.Printf("\n\n%s:%d\n\n", c.MqttUrl, c.MqttPort)
+
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("mqtt://%s:%d", c.MqttUrl, c.MqttPort))
+	opts.AddBroker(fmt.Sprintf("%s:%d", c.MqttUrl, c.MqttPort))
 	opts.SetClientID(c.DeviceName)
-	opts.SetDefaultPublishHandler(m.MessagePubHandler)
+	opts.SetDefaultPublishHandler(m.onReceiveMessage)
 	opts.OnConnect = m.ConnectHandler
 	opts.OnConnectionLost = m.ConnectLostHandler
-	m.Client = mqtt.NewClient(opts)
+
+	client := mqtt.NewClient(opts)
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	}
+
+	m.Client = client
 
 	return &m
 }
@@ -88,7 +96,7 @@ func (m *Mqtt) onData(data []byte) (domain.CommandType, []byte, error) {
 	}
 }
 
-func (m Mqtt) MessagePubHandler(client mqtt.Client, msg mqtt.Message) {
+func (m Mqtt) onReceiveMessage(client mqtt.Client, msg mqtt.Message) {
 	b := []byte(msg.Payload())
 	cmdType, resp, err := m.onData(b)
 	cmdTypeStr := strconv.Itoa(int(cmdType))
@@ -114,6 +122,10 @@ func (m Mqtt) MessagePubHandler(client mqtt.Client, msg mqtt.Message) {
 
 func (m *Mqtt) ConnectHandler(client mqtt.Client) {
 	fmt.Println("Connected")
+
+	if token := m.Client.Subscribe(m.Config.FdChannel, 0, m.onReceiveMessage); token.Wait() && token.Error() != nil {
+		m.notify <- token.Error()
+	}
 }
 
 func (m *Mqtt) ConnectLostHandler(client mqtt.Client, err error) {
