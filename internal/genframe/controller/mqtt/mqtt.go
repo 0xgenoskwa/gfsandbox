@@ -32,7 +32,11 @@ type Mqtt struct {
 }
 
 func ProvideMQTT(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) *Mqtt {
-	m := Mqtt{}
+	m := Mqtt{
+		Config:  c,
+		Usecase: u,
+		Chrome:  chr,
+	}
 
 	opts := mqtt.NewClientOptions()
 	mqttUri := fmt.Sprintf("%s:%d", c.MqttUrl, c.MqttPort)
@@ -45,11 +49,11 @@ func ProvideMQTT(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) *Mqtt
 	opts.OnConnectionLost = m.ConnectLostHandler
 
 	client := mqtt.NewClient(opts)
-	m.Client = client
-	if token := m.Client.Connect(); token.Wait() && token.Error() != nil {
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
 
+	m.Client = client
 	return &m
 }
 

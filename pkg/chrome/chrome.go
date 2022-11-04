@@ -77,8 +77,9 @@ func (c *Chrome) Toast(text string) error {
 }
 
 func (c *Chrome) SendTouchEvent(event string, value domain.TouchEvent) error {
-	err := chromedp.Run(c.Context, chromedp.Tasks{
-		chromedp.QueryAfter("#genframe", func(ctx context.Context, eci runtime.ExecutionContextID, n ...*cdp.Node) error {
+	ictx, _ := chromedp.NewContext(c.Context, chromedp.WithTargetID("genframe"))
+	err := chromedp.Run(ictx, chromedp.Tasks{
+		chromedp.QueryAfter("body", func(ctx context.Context, eci runtime.ExecutionContextID, n ...*cdp.Node) error {
 			boxes, err := dom.GetContentQuads().WithNodeID(n[0].NodeID).Do(ctx)
 			if err != nil {
 				return err
