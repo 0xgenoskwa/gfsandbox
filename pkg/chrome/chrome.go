@@ -26,7 +26,7 @@ func (c *Chrome) Init(ctx context.Context) (func(), error) {
 		chromedp.Flag("headless", false), // cause default option is headless
 		chromedp.Flag("start-fullscreen", true),
 		chromedp.Flag("disable-gpu", false),
-		chromedp.Flag("disable-web-security", true),
+		// chromedp.Flag("disable-web-security", true),
 		chromedp.Flag("no-default-browser-check", true),
 		chromedp.Flag("enable-automation", false),
 		chromedp.Flag("disable-extensions", true),
