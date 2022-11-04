@@ -124,7 +124,7 @@ func (c *Chrome) SendTouchEvent(event string, value domain.TouchEvent) error {
 
 			p := input.DispatchTouchEventParams{
 				Type:        touchType,
-				TouchPoints: []*input.TouchPoint{{X: x, Y: y}},
+				TouchPoints: touchPoints,
 			}
 			if err := p.Do(ctx); err != nil {
 				return err
