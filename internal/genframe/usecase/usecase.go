@@ -51,8 +51,8 @@ func (u *Usecase) GetInformation() ([]byte, error) {
 		MqttPort:     u.Config.MqttPort,
 		FaChannel:    u.Config.FaChannel,
 		FdChannel:    u.Config.FdChannel,
-		ScreenWidth:  dParts[0],
-		ScreenHeight: dParts[1],
+		ScreenWidth:  strings.TrimSpace(dParts[0]),
+		ScreenHeight: strings.TrimSpace(dParts[1]),
 		Version:      u.Config.Version,
 		Build:        u.Config.Build,
 	}
