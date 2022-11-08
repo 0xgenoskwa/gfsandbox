@@ -38,23 +38,26 @@ func ProvideMQTT(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) *Mqtt
 		Chrome:  chr,
 	}
 
+	return &m
+}
+
+func (m *Mqtt) Start() error {
 	opts := mqtt.NewClientOptions()
-	mqttUri := fmt.Sprintf("%s:%d", c.MqttUrl, c.MqttPort)
-	fmt.Printf("\n\n%s:%d\n\n", c.MqttUrl, c.MqttPort)
-	fmt.Println(mqttUri)
+	mqttUri := fmt.Sprintf("%s:%d", m.Config.MqttUrl, m.Config.MqttPort)
 	opts.AddBroker(mqttUri)
-	opts.SetClientID(c.DeviceName)
+	opts.SetClientID(m.Config.DeviceName)
 	opts.SetDefaultPublishHandler(m.onReceiveMessage)
 	opts.OnConnect = m.ConnectHandler
 	opts.OnConnectionLost = m.ConnectLostHandler
 
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
+		return token.Error()
 	}
 
 	m.Client = client
-	return &m
+
+	return nil
 }
 
 func (m *Mqtt) onData(data []byte) (domain.CommandType, []byte, error) {

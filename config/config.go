@@ -18,13 +18,15 @@ type Config struct {
 	Version string `json:"-"`
 	Build   string `json:"-"`
 
-	DeviceName string `json:"device_name"`
-	WifiSsid   string `json:"wifi_ssid"`
-	WifiPsk    string `json:"wifi_psk"`
-	MqttUrl    string `json:"mqtt_url"`
-	MqttPort   int    `json:"mqtt_port"`
-	FaChannel  string `json:"fa_channel"`
-	FdChannel  string `json:"fd_channel"`
+	DeviceName   string `json:"device_name"`
+	WifiSsid     string `json:"wifi_ssid"`
+	WifiPsk      string `json:"wifi_psk"`
+	MqttUrl      string `json:"mqtt_url"`
+	MqttPort     int    `json:"mqtt_port"`
+	MqttUsername string `json:"mqtt_username"`
+	MqttPassword string `json:"mqtt_password"`
+	FaChannel    string `json:"fa_channel"`
+	FdChannel    string `json:"fd_channel"`
 }
 
 func ProvideConfig() *Config {

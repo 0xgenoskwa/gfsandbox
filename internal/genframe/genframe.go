@@ -50,9 +50,17 @@ func (g *Genframe) Run() {
 		panic(err)
 	}
 	defer cancel()
-	fmt.Println("genframe Chrome run 1")
+	// open html
 	g.Chrome.OpenHtml()
-	fmt.Println("genframe Chrome run 2")
+
+	// start bluetooth
+	if err := g.BluetoothHandler.Start(); err != nil {
+		panic(err)
+	}
+	// start mqtt
+	if err := g.MqttHandler.Start(); err != nil {
+		panic(err)
+	}
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
@@ -69,5 +77,8 @@ func (g *Genframe) Run() {
 
 	if err := g.BluetoothHandler.Shutdown(); err != nil {
 		fmt.Println(fmt.Errorf("app - Run - g.BluetoothHandler.Shutdown: %w", err))
+	}
+	if err := g.MqttHandler.Shutdown(); err != nil {
+		fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Shutdown: %w", err))
 	}
 }

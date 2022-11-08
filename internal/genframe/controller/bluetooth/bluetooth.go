@@ -46,8 +46,6 @@ func ProvideBluetooth(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) 
 		notify:  make(chan error, 1),
 	}
 
-	b.Start()
-
 	return &b
 }
 
@@ -94,11 +92,10 @@ func (b *Bluetooth) onData(data []byte) (domain.CommandType, []byte, error) {
 	}
 }
 
-func (b *Bluetooth) Start() {
-	fmt.Print("start", b.Config)
+func (b *Bluetooth) Start() error {
 	adapter := tinybl.DefaultAdapter
 	if err := adapter.Enable(); err != nil {
-		b.notify <- err
+		return err
 	}
 	b.Adapter = adapter
 	adv := adapter.DefaultAdvertisement()
@@ -106,11 +103,11 @@ func (b *Bluetooth) Start() {
 		LocalName:    b.Config.DeviceName, // Nordic UART Service
 		ServiceUUIDs: []tinybl.UUID{serviceUUID},
 	}); err != nil {
-		b.notify <- err
+		return err
 	}
 	b.Advertisement = adv
 	if err := adv.Start(); err != nil {
-		b.notify <- err
+		return err
 	}
 	if err := adapter.AddService(&tinybl.Service{
 		UUID: serviceUUID,
@@ -149,7 +146,7 @@ func (b *Bluetooth) Start() {
 			},
 		},
 	}); err != nil {
-		b.notify <- err
+		return err
 	}
 }
 

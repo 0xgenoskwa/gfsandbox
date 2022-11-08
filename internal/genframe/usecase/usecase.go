@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os/exec"
+	"strings"
 
 	"go.genframe.xyz/config"
 	"go.genframe.xyz/domain"
@@ -32,8 +34,29 @@ func (u *Usecase) GetInformation() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	data := map[string]interface{}{}
-	data["mac_address"] = macAddr
+	cmd := exec.Command("xdpyinfo | awk '/dimensions/{print $2}'")
+	stdout, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	dParts := strings.Split(string(stdout), "x")
+
+	data := domain.CommandInformationResponse{
+		MacAddress:   macAddr,
+		DeviceName:   u.Config.DeviceName,
+		WifiSsid:     u.Config.WifiSsid,
+		WifiPsk:      u.Config.WifiPsk,
+		MqttUrl:      u.Config.MqttUrl,
+		MqttPort:     u.Config.MqttPort,
+		FaChannel:    u.Config.FaChannel,
+		FdChannel:    u.Config.FdChannel,
+		ScreenWidth:  dParts[0],
+		ScreenHeight: dParts[1],
+		Version:      u.Config.Version,
+		Build:        u.Config.Build,
+	}
+
 	bytes, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
