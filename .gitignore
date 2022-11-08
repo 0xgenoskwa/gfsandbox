@@ -1,2 +1,4 @@
 genframe-*
 bazel-*
+
+config.json
