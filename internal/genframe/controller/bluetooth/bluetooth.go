@@ -148,6 +148,8 @@ func (b *Bluetooth) Start() error {
 	}); err != nil {
 		return err
 	}
+
+	return nil
 }
 
 // Notify -.
