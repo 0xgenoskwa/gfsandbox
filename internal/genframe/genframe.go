@@ -42,6 +42,7 @@ func ProvideGenframe(c *config.Config, w *wifi.Wifi, chr *chrome.Chrome, u *usec
 }
 
 func (g *Genframe) Run() {
+	fmt.Println("genframe Chrome run 1")
 	ctx := context.Background()
 
 	cancel, err := g.Chrome.Init(ctx)
@@ -49,7 +50,9 @@ func (g *Genframe) Run() {
 		panic(err)
 	}
 	defer cancel()
+	fmt.Println("genframe Chrome run 1")
 	g.Chrome.OpenHtml()
+	fmt.Println("genframe Chrome run 2")
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)

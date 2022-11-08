@@ -2,6 +2,7 @@ package chrome
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/chromedp/cdproto/cdp"
@@ -41,10 +42,13 @@ func (c *Chrome) Init(ctx context.Context) (func(), error) {
 }
 
 func (c *Chrome) OpenHtml() error {
+	fmt.Println("open chrome err 123")
 	err := chromedp.Run(c.Context, chromedp.Navigate("http://localhost"))
+	fmt.Println("open chrome err", err)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -79,8 +83,7 @@ func (c *Chrome) Toast(text string) error {
 }
 
 func (c *Chrome) SendTouchEvent(event string, value domain.TouchEvent) error {
-	ictx, _ := chromedp.NewContext(c.Context, chromedp.WithTargetID("genframe"))
-	err := chromedp.Run(ictx, chromedp.Tasks{
+	err := chromedp.Run(c.Context, chromedp.Tasks{
 		chromedp.QueryAfter("body", func(ctx context.Context, eci runtime.ExecutionContextID, n ...*cdp.Node) error {
 			boxes, err := dom.GetContentQuads().WithNodeID(n[0].NodeID).Do(ctx)
 			if err != nil {
@@ -128,10 +131,6 @@ func (c *Chrome) SendTouchEvent(event string, value domain.TouchEvent) error {
 				Type:        touchType,
 				TouchPoints: touchPoints,
 			}
-			if err := p.Do(ctx); err != nil {
-				return err
-			}
-			p.Type = input.TouchEnd
 			if err := p.Do(ctx); err != nil {
 				return err
 			}
