@@ -34,7 +34,7 @@ func (u *Usecase) GetInformation() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	cmd := exec.Command("xdpyinfo | awk '/dimensions/{print $2}'")
+	cmd := exec.Command("bash", "-c", "xdpyinfo | awk '/dimensions/{print $2}'")
 	stdout, err := cmd.Output()
 	if err != nil {
 		return nil, err
