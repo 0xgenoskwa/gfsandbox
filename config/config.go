@@ -72,9 +72,9 @@ func (c *Config) SaveConfig() error {
 		if err != nil {
 			panic(err)
 		}
-		deviceName := fmt.Sprintf("Genframe#%s", strings.Replace(macAddr[len(macAddr)-5:], ":", "", -1))
+		deviceName := fmt.Sprintf("Genframe#%s", strings.Replace(macAddr, ":", "", -1))
 		c.DeviceName = deviceName
-		c.MqttUrl = "mqtt://mqtt.dev.generative.xyz"
+		c.MqttUrl = "tcp://mqtt.dev.generative.xyz"
 		c.MqttPort = 1883
 	}
 	file, err := json.MarshalIndent(c, "", "  ")
