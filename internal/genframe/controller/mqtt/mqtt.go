@@ -79,6 +79,12 @@ func (m *Mqtt) onData(data []byte) (domain.CommandType, []byte, error) {
 			return cmdType, nil, err
 		}
 		return cmdType, resp, nil
+	case domain.CommandTypeGetMacAddress:
+		resp, err := m.Usecase.GetMacAddress()
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
 	case domain.CommandTypeSetup:
 		resp, err := m.Usecase.Setup(msg)
 		if err != nil {
@@ -117,6 +123,9 @@ func (m Mqtt) onReceiveMessage(client mqtt.Client, msg mqtt.Message) {
 		msg = append(msg, []byte(":")...)
 		msg = append(msg, bytes...)
 		fmt.Println("err data", string(msg))
+		if token := m.Client.Publish(m.Config.FdChannel, 0, false, msg); token.Wait() && token.Error() != nil {
+			m.notify <- token.Error()
+		}
 	}
 	if resp != nil {
 		cmdTypeStr := strconv.Itoa(int(cmdType))
@@ -124,13 +133,16 @@ func (m Mqtt) onReceiveMessage(client mqtt.Client, msg mqtt.Message) {
 		msg = append(msg, []byte(":")...)
 		msg = append(msg, resp...)
 		fmt.Println("err data", string(msg))
+		if token := m.Client.Publish(m.Config.FdChannel, 0, false, msg); token.Wait() && token.Error() != nil {
+			m.notify <- token.Error()
+		}
 	}
 }
 
 func (m *Mqtt) ConnectHandler(client mqtt.Client) {
 	fmt.Println("Connected", m.Client, m.Config.FdChannel)
 
-	if token := m.Client.Subscribe(m.Config.FdChannel, 0, m.onReceiveMessage); token.Wait() && token.Error() != nil {
+	if token := m.Client.Subscribe(m.Config.FaChannel, 0, m.onReceiveMessage); token.Wait() && token.Error() != nil {
 		m.notify <- token.Error()
 	}
 }

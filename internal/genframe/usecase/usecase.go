@@ -64,6 +64,23 @@ func (u *Usecase) GetInformation() ([]byte, error) {
 	return bytes, nil
 }
 
+func (u *Usecase) GetMacAddress() ([]byte, error) {
+	fmt.Printf("process cmd get mac address")
+	macAddr, err := system.GetWirelessMacAddr()
+	if err != nil {
+		return nil, err
+	}
+
+	data := map[string]interface{}{
+		"mac_address": macAddr,
+	}
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	return bytes, nil
+}
+
 func (u *Usecase) Setup(msg []byte) ([]byte, error) {
 	var setupCmd domain.CommandSetup
 	err := json.Unmarshal(msg, &setupCmd)
@@ -88,7 +105,7 @@ func (u *Usecase) Setup(msg []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	data, err := u.GetInformation()
+	data, err := u.GetMacAddress()
 	if err != nil {
 		return nil, err
 	}

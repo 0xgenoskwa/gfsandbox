@@ -7,6 +7,9 @@ const (
 	CommandTypeSetup
 	CommandTypeOpenUrl
 	CommandTypeSendTouchEvent
+	CommandTypeSendKeyEvent
+	CommandTypeToggleDim
+	CommandTypeGetMacAddress
 )
 
 type CommandInformationResponse struct {

@@ -68,6 +68,12 @@ func (b *Bluetooth) onData(data []byte) (domain.CommandType, []byte, error) {
 			return cmdType, nil, err
 		}
 		return cmdType, resp, nil
+	case domain.CommandTypeGetMacAddress:
+		resp, err := b.Usecase.GetMacAddress()
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
 	case domain.CommandTypeSetup:
 		resp, err := b.Usecase.Setup(msg)
 		if err != nil {
