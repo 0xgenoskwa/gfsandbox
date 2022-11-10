@@ -139,3 +139,17 @@ func (u *Usecase) SendTouchEvent(msg []byte) ([]byte, error) {
 
 	return nil, nil
 }
+
+func (u *Usecase) SendKeyEvent(msg []byte) ([]byte, error) {
+	var stCmd domain.CommandSendKeyEvent
+	err := json.Unmarshal(msg, &stCmd)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("process cmd send key event %+v\n", stCmd)
+	if err := u.Chrome.SendKeyEvent(stCmd.Key); err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}

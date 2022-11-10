@@ -59,6 +59,14 @@ type CommandSendTouchEventResponse struct {
 	Result bool `json:"result"`
 }
 
+type CommandSendKeyEvent struct {
+	Key string `json:"event"`
+}
+
+type CommandSendKeyEventResponse struct {
+	Result bool `json:"result"`
+}
+
 type ErrorResponse struct {
 	Data  []byte `json:"data"`
 	Error string `json:"error"`

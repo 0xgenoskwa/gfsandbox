@@ -142,3 +142,13 @@ func (c *Chrome) SendTouchEvent(event string, value domain.TouchEvent) error {
 	}
 	return nil
 }
+
+func (c *Chrome) SendKeyEvent(value string) error {
+	err := chromedp.Run(c.Context, chromedp.Tasks{
+		chromedp.SendKeys("#genframe", value, chromedp.ByID),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

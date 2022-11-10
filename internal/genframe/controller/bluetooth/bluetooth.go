@@ -93,6 +93,12 @@ func (b *Bluetooth) onData(data []byte) (domain.CommandType, []byte, error) {
 			return cmdType, nil, err
 		}
 		return cmdType, resp, nil
+	case domain.CommandTypeSendKeyEvent:
+		resp, err := b.Usecase.SendKeyEvent(msg)
+		if err != nil {
+			return cmdType, nil, err
+		}
+		return cmdType, resp, nil
 	default:
 		return -1, nil, errors.New("unknown cmd")
 	}
