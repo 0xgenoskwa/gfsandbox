@@ -100,15 +100,20 @@ func (w *Wifi) StartWifiMonitoring() {
 	noConnCount := 0
 	state := false
 	for {
+		fmt.Println("start check internet")
 		if w.HasInternet() {
+			fmt.Println("has internet")
 			noConnCount = 0
 			if !state {
+				fmt.Println("return signal has internet")
 				state = true
 				w.signal <- state
 			}
 		} else {
 			noConnCount = noConnCount + 1
+			fmt.Println("dont have internet", noConnCount)
 			if noConnCount > 3 {
+				fmt.Println("return signal dont have internet")
 				state = false
 				w.signal <- state
 			}
