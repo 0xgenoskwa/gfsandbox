@@ -43,16 +43,11 @@ func ProvideConfig() *Config {
 }
 
 func (c *Config) LoadConfig() error {
-	fmt.Println("Load config", c.Path)
 	if _, err := os.Stat(c.Path); os.IsNotExist(err) {
-		fmt.Println("Load config is not existed path", c.Path)
-		if serr := c.SaveConfig(); serr != nil {
-			fmt.Println("c.SaveConfig has err???", serr)
-			return serr
+		if err := c.SaveConfig(); err != nil {
+			return err
 		}
-		fmt.Println("Load config is not existed path end", c.Path)
 	}
-	fmt.Println("Load config existed path", c.Path)
 	jsonFile, err := os.Open(c.Path)
 	// if we os.Open returns an error then handle it
 	if err != nil {
@@ -66,12 +61,10 @@ func (c *Config) LoadConfig() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Load config existed path end")
 	return nil
 }
 
 func (c *Config) SaveConfig() error {
-	fmt.Println("Start save config")
 	if c.DeviceName == "" {
 		macAddr, err := system.GetWirelessMacAddr()
 		if err != nil {
@@ -80,22 +73,18 @@ func (c *Config) SaveConfig() error {
 		deviceName := fmt.Sprintf("Genframe#%s", strings.Replace(macAddr, ":", "", -1))
 		c.DeviceName = deviceName
 	}
-	fmt.Println("Save config - fix device name")
 	file, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		return err
 	}
-	fmt.Println("Start save config write file")
 
 	err = os.WriteFile(c.Path, file, 0644)
 	if err != nil {
 		return err
 	}
-	fmt.Println("dispatch to channel")
 	go func() {
 		c.changed <- true
 	}()
-	fmt.Println("dispatch to channel end")
 	return nil
 }
 
