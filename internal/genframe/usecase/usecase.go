@@ -53,6 +53,7 @@ func (u *Usecase) GetInformation() ([]byte, error) {
 		FdChannel:    u.Config.FdChannel,
 		ScreenWidth:  strings.TrimSpace(dParts[0]),
 		ScreenHeight: strings.TrimSpace(dParts[1]),
+		ServingUrl:   u.Config.ServingUrl,
 		Version:      u.Config.Version,
 		Build:        u.Config.Build,
 	}
@@ -93,6 +94,14 @@ func (u *Usecase) Setup(msg []byte) ([]byte, error) {
 		u.Chrome.Toast(err.Error())
 		return nil, err
 	}
+
+	hasInternet := u.Wifi.HasInternet()
+	if !hasInternet {
+		err := errors.New("incorrect ssid/psk")
+		u.Chrome.Toast(err.Error())
+		return nil, err
+	}
+
 	u.Chrome.Toast(fmt.Sprintf("Connect wifi %s success", setupCmd.WifiSsid))
 	// Save config
 	u.Config.WifiSsid = setupCmd.WifiSsid
@@ -122,6 +131,11 @@ func (u *Usecase) OpenUrl(msg []byte) ([]byte, error) {
 	if err := u.Chrome.OpenUrl(ouCmd.Url); err != nil {
 		return nil, err
 	}
+
+	go func() {
+		u.Config.ServingUrl = ouCmd.Url
+		u.Config.SaveConfig()
+	}()
 
 	return nil, nil
 }

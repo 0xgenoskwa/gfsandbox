@@ -3,6 +3,7 @@ package wifi
 import (
 	"bytes"
 	"errors"
+	"net/http"
 	"os/exec"
 	"strings"
 	"time"
@@ -83,4 +84,11 @@ func (w *Wifi) Connect(ssid, psk string) ([]byte, error) {
 	}
 
 	return out.Bytes(), nil
+}
+
+func (w *Wifi) HasInternet() (ok bool) {
+	if _, err := http.Get("http://clients3.google.com/generate_204"); err != nil {
+		return false
+	}
+	return true
 }

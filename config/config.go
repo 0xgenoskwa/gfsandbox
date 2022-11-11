@@ -18,6 +18,8 @@ type Config struct {
 	Version string `json:"-"`
 	Build   string `json:"-"`
 
+	Changed chan bool
+
 	DeviceName   string `json:"device_name"`
 	WifiSsid     string `json:"wifi_ssid"`
 	WifiPsk      string `json:"wifi_psk"`
@@ -27,6 +29,7 @@ type Config struct {
 	MqttPassword string `json:"mqtt_password"`
 	FaChannel    string `json:"fa_channel"`
 	FdChannel    string `json:"fd_channel"`
+	ServingUrl   string `json:"serving_url"`
 }
 
 func ProvideConfig() *Config {
@@ -86,6 +89,8 @@ func (c *Config) SaveConfig() error {
 	if err != nil {
 		return err
 	}
+
+	c.Changed <- true
 
 	return nil
 }

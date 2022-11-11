@@ -21,6 +21,7 @@ type CommandInformationResponse struct {
 	MqttPort   int    `json:"mqtt_port"`
 	FaChannel  string `json:"fa_channel"`
 	FdChannel  string `json:"fd_channel"`
+	ServingUrl string `json:"serving_url"`
 
 	ScreenWidth  string `json:"screen_width"`
 	ScreenHeight string `json:"screen_height"`
