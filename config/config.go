@@ -92,7 +92,9 @@ func (c *Config) SaveConfig() error {
 		return err
 	}
 	fmt.Println("dispatch to channel")
-	c.changed <- true
+	go func() {
+		c.changed <- true
+	}()
 	fmt.Println("dispatch to channel end")
 	return nil
 }
