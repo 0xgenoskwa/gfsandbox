@@ -13,9 +13,9 @@ TAG:=${shell git rev-parse --short HEAD}
 BUILD:=${shell date +%FT%T%z}
 
 # Setup the -ldflags option for go build here, interpolate the variable values
-GENFRAME_LDFLAGS=-ldflags "-X ${REPO}/config.Version=${GENFRAME_VERSION}-${TAG} -X ${REPO}/config.Build=${BUILD}"
-AUTOUPDAER_LDFLAGS=-ldflags "-X ${REPO}/config.Version=${GENFRAME_VERSION}-${TAG} -X ${REPO}/config.Build=${BUILD}"
-BOOTSTRAP_LDFLAGS=-ldflags "-X ${REPO}/config.Version=${GENFRAME_VERSION}-${TAG} -X ${REPO}/config.Build=${BUILD}"
+GENFRAME_LDFLAGS=-ldflags "-X go.genframe.xyz/config.Version=${GENFRAME_VERSION}-${TAG} -X go.genframe.xyz/config.Build=${BUILD}"
+AUTOUPDAER_LDFLAGS=-ldflags "-X go.genframe.xyz/config.Version=${GENFRAME_VERSION}-${TAG} -X go.genframe.xyz/config.Build=${BUILD}"
+BOOTSTRAP_LDFLAGS=-ldflags "-X go.genframe.xyz/config.Version=${GENFRAME_VERSION}-${TAG} -X go.genframe.xyz/config.Build=${BUILD}"
 
 generate:
 	GOFLAGS=-mod=mod go generate ./...
