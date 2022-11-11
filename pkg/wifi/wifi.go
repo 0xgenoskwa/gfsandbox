@@ -15,7 +15,9 @@ type Wifi struct {
 }
 
 func ProvideWifi() *Wifi {
-	return &Wifi{}
+	return &Wifi{
+		signal: make(chan bool),
+	}
 }
 
 func (w *Wifi) Scan() ([]byte, error) {
