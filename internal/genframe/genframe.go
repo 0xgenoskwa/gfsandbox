@@ -75,24 +75,26 @@ func (g *Genframe) Run() {
 
 	// monitoring network logic
 	go func() {
-		select {
-		case status := <-g.Wifi.Signal():
-			fmt.Println("wifi signal status", status)
-			if status && g.Config.HasMqttConfig() && !g.MqttHandler.Started {
-				if err := g.MqttHandler.Start(); err != nil {
-					panic(err)
+		for {
+			select {
+			case status := <-g.Wifi.Signal():
+				fmt.Println("wifi signal status", status)
+				if status && g.Config.HasMqttConfig() && !g.MqttHandler.Started {
+					if err := g.MqttHandler.Start(); err != nil {
+						panic(err)
+					}
 				}
-			}
-			if !status && g.MqttHandler.Started {
-				g.MqttHandler.Shutdown()
-			}
-		case <-g.Config.Changed():
-			networkStatus := g.Wifi.HasInternet()
-			if networkStatus && g.Config.HasMqttConfig() {
-				if g.MqttHandler.Started {
+				if !status && g.MqttHandler.Started {
 					g.MqttHandler.Shutdown()
 				}
-				g.MqttHandler.Start()
+			case <-g.Config.Changed():
+				networkStatus := g.Wifi.HasInternet()
+				if networkStatus && g.Config.HasMqttConfig() {
+					if g.MqttHandler.Started {
+						g.MqttHandler.Shutdown()
+					}
+					g.MqttHandler.Start()
+				}
 			}
 		}
 	}()
