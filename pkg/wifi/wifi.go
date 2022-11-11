@@ -12,8 +12,6 @@ import (
 
 type Wifi struct {
 	signal chan bool
-
-	monitoring chan bool
 }
 
 func ProvideWifi() *Wifi {
@@ -102,35 +100,22 @@ func (w *Wifi) StartWifiMonitoring() {
 	noConnCount := 0
 	state := false
 	for {
-		select {
-		case <-w.monitoring:
-			fmt.Println("stop monitoring")
-			return
-		default:
-			if w.HasInternet() {
-				noConnCount = 0
-				if !state {
-					state = true
-					w.signal <- state
-				}
-			} else {
-				noConnCount = noConnCount + 1
-				if noConnCount > 3 {
-					state = false
-					w.signal <- state
-				}
+		if w.HasInternet() {
+			noConnCount = 0
+			if !state {
+				state = true
+				w.signal <- state
 			}
-
-			time.Sleep(2 * time.Second)
+		} else {
+			noConnCount = noConnCount + 1
+			if noConnCount > 3 {
+				state = false
+				w.signal <- state
+			}
 		}
-	}
-}
 
-func (w *Wifi) StopWifiMonitoring() {
-	fmt.Println("Wifi monitoring stop")
-	go func() {
-		w.monitoring <- true
-	}()
+		time.Sleep(2 * time.Second)
+	}
 }
 
 func (w *Wifi) Signal() chan bool {
