@@ -28,6 +28,8 @@ type Mqtt struct {
 	Chrome  *chrome.Chrome
 	Client  mqtt.Client
 
+	Started bool
+
 	notify chan error
 }
 
@@ -58,12 +60,7 @@ func (m *Mqtt) Start() error {
 
 	m.Client = client
 
-	go func() {
-		<-m.Config.Changed()
-		m.Shutdown()
-		m.Start()
-	}()
-
+	m.Started = true
 	return nil
 }
 
@@ -189,5 +186,6 @@ func (m *Mqtt) Notify() <-chan error {
 func (m *Mqtt) Shutdown() error {
 	fmt.Println("Mqtt stop")
 	m.Client.Disconnect(1000)
+	m.Started = false
 	return nil
 }

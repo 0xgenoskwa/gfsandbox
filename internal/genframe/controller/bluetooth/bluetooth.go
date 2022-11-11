@@ -35,6 +35,8 @@ type Bluetooth struct {
 	Usecase *usecase.Usecase
 	Chrome  *chrome.Chrome
 
+	Started bool
+
 	notify chan error
 }
 
@@ -162,6 +164,7 @@ func (b *Bluetooth) Start() error {
 		return err
 	}
 
+	b.Started = true
 	return nil
 }
 
@@ -173,5 +176,6 @@ func (b *Bluetooth) Notify() <-chan error {
 // Shutdown -.
 func (b *Bluetooth) Shutdown() error {
 	fmt.Println("Bluetooth stop")
+	b.Started = false
 	return b.Advertisement.Stop()
 }

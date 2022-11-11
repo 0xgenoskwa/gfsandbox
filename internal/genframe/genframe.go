@@ -68,26 +68,31 @@ func (g *Genframe) Run() {
 	}
 
 	// start mqtt
-	startedMqtt := false
 	if g.Wifi.HasInternet() && g.Config.HasMqttConfig() {
 		if err := g.MqttHandler.Start(); err != nil {
 			panic(err)
 		}
-		startedMqtt = true
 	}
 
 	// monitoring network logic
 	go func() {
-		for status := range g.Wifi.Signal() {
-			if status && g.Config.HasMqttConfig() && !startedMqtt {
+		select {
+		case status := <-g.Wifi.Signal():
+			if status && g.Config.HasMqttConfig() && !g.MqttHandler.Started {
 				if err := g.MqttHandler.Start(); err != nil {
 					panic(err)
 				}
-				startedMqtt = true
 			}
-			if !status && startedMqtt {
+			if !status && g.MqttHandler.Started {
 				g.MqttHandler.Shutdown()
-				startedMqtt = false
+			}
+		case <-g.Config.Changed():
+			networkStatus := g.Wifi.HasInternet()
+			if networkStatus && g.Config.HasMqttConfig() {
+				if g.MqttHandler.Started {
+					g.MqttHandler.Shutdown()
+				}
+				g.MqttHandler.Start()
 			}
 		}
 	}()
@@ -105,10 +110,16 @@ func (g *Genframe) Run() {
 		fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Notify: %w", err))
 	}
 
-	if err := g.BluetoothHandler.Shutdown(); err != nil {
-		fmt.Println(fmt.Errorf("app - Run - g.BluetoothHandler.Shutdown: %w", err))
+	if g.BluetoothHandler.Started {
+		if err := g.BluetoothHandler.Shutdown(); err != nil {
+			fmt.Println(fmt.Errorf("app - Run - g.BluetoothHandler.Shutdown: %w", err))
+		}
 	}
-	if err := g.MqttHandler.Shutdown(); err != nil {
-		fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Shutdown: %w", err))
+
+	if g.MqttHandler.Started {
+		if err := g.MqttHandler.Shutdown(); err != nil {
+			fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Shutdown: %w", err))
+		}
 	}
+
 }
