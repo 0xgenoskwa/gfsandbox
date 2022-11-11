@@ -50,6 +50,7 @@ func (c *Config) LoadConfig() error {
 			fmt.Println("c.SaveConfig has err???", serr)
 			return serr
 		}
+		fmt.Println("Load config is not existed path end", c.Path)
 	}
 	fmt.Println("Load config existed path", c.Path)
 	jsonFile, err := os.Open(c.Path)
