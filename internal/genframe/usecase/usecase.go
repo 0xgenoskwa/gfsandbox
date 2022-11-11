@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 
 	"go.genframe.xyz/config"
 	"go.genframe.xyz/domain"
@@ -95,9 +96,9 @@ func (u *Usecase) Setup(msg []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	fmt.Println("check has internet")
+	// wait network init
+	time.Sleep(3 * time.Second)
 	hasInternet := u.Wifi.HasInternet()
-	fmt.Println("check has internet", hasInternet)
 	if !hasInternet {
 		err := errors.New("incorrect ssid/psk")
 		u.Chrome.Toast(err.Error())
