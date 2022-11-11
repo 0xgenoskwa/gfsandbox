@@ -71,26 +71,29 @@ func (c *Config) LoadConfig() error {
 }
 
 func (c *Config) SaveConfig() error {
+	fmt.Println("Start save config")
 	if c.DeviceName == "" {
 		macAddr, err := system.GetWirelessMacAddr()
 		if err != nil {
-			panic(err)
+			return err
 		}
 		deviceName := fmt.Sprintf("Genframe#%s", strings.Replace(macAddr, ":", "", -1))
 		c.DeviceName = deviceName
 	}
+	fmt.Println("Save config - fix device name")
 	file, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		return err
 	}
+	fmt.Println("Start save config write file")
 
 	err = os.WriteFile(c.Path, file, 0644)
 	if err != nil {
 		return err
 	}
-
+	fmt.Println("dispatch to channel")
 	c.changed <- true
-
+	fmt.Println("dispatch to channel end")
 	return nil
 }
 
