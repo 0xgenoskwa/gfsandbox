@@ -92,7 +92,6 @@ func (w *Wifi) Connect(ssid, psk string) ([]byte, error) {
 }
 
 func (w *Wifi) HasInternet() (ok bool) {
-	fmt.Println("HasInternet start")
 	client := &http.Client{
 		Timeout: 3 * time.Second,
 	}
@@ -105,12 +104,9 @@ func (w *Wifi) HasInternet() (ok bool) {
 	if err != nil {
 		return false
 	}
-	_, err = client.Do(req)
-	if err != nil {
-		fmt.Println("HasInternet return false")
+	if _, err = client.Do(req); err != nil {
 		return false
 	}
-	fmt.Println("HasInternet return true")
 	return true
 }
 
@@ -119,22 +115,17 @@ func (w *Wifi) StartWifiMonitoring() {
 	noConnCount := 0
 	state := false
 	for {
-		fmt.Println("start check internet")
 		if w.HasInternet() {
-			fmt.Println("has internet")
 			noConnCount = 0
-			fmt.Println("return signal has internet")
-			state = true
-			w.signal <- state
-			fmt.Println("end return signal has internet")
+			if !state {
+				state = true
+				w.signal <- state
+			}
 		} else {
 			noConnCount = noConnCount + 1
-			fmt.Println("dont have internet", noConnCount)
 			if noConnCount > 3 {
-				fmt.Println("return signal dont have internet")
 				state = false
 				w.signal <- state
-				fmt.Println("end return signal dont have internet")
 			}
 		}
 
