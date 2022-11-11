@@ -108,6 +108,7 @@ func (w *Wifi) StartWifiMonitoring() {
 				fmt.Println("return signal has internet")
 				state = true
 				w.signal <- state
+				fmt.Println("end return signal has internet")
 			}
 		} else {
 			noConnCount = noConnCount + 1
@@ -116,6 +117,7 @@ func (w *Wifi) StartWifiMonitoring() {
 				fmt.Println("return signal dont have internet")
 				state = false
 				w.signal <- state
+				fmt.Println("end return signal dont have internet")
 			}
 		}
 
