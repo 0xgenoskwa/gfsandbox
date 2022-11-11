@@ -128,7 +128,9 @@ func (w *Wifi) StartWifiMonitoring() {
 
 func (w *Wifi) StopWifiMonitoring() {
 	fmt.Println("Wifi monitoring stop")
-	w.monitoring <- true
+	go func() {
+		w.monitoring <- true
+	}()
 }
 
 func (w *Wifi) Signal() chan bool {
