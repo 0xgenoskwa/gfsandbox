@@ -2,6 +2,7 @@ package wifi
 
 import (
 	"bytes"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -92,11 +93,22 @@ func (w *Wifi) Connect(ssid, psk string) ([]byte, error) {
 
 func (w *Wifi) HasInternet() (ok bool) {
 	fmt.Println("HasInternet start")
-	if _, err := http.Get("http://clients3.google.com/generate_204"); err != nil {
-		fmt.Println("HasIntenet end with false")
+	client := &http.Client{}
+	client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	req, err := http.NewRequest("GET", "http://clients3.google.com/generate_204", nil)
+	if err != nil {
 		return false
 	}
-	fmt.Println("HasInternet end with true")
+	_, err = client.Do(req)
+	if err != nil && strings.HasSuffix(strings.ToLower(err.Error()), "no such host") {
+		fmt.Println("HasInternet return false")
+		return false
+	}
+	fmt.Println("HasInternet return true")
 	return true
 }
 
