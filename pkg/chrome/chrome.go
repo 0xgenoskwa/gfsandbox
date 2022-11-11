@@ -2,7 +2,6 @@ package chrome
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chromedp/cdproto/cdp"
@@ -42,9 +41,7 @@ func (c *Chrome) Init(ctx context.Context) (func(), error) {
 }
 
 func (c *Chrome) OpenHtml() error {
-	fmt.Println("open chrome err 123")
 	err := chromedp.Run(c.Context, chromedp.Navigate("http://localhost"))
-	fmt.Println("open chrome err", err)
 	if err != nil {
 		return err
 	}
