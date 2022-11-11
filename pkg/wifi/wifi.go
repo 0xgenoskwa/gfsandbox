@@ -93,7 +93,7 @@ func (w *Wifi) Connect(ssid, psk string) ([]byte, error) {
 
 func (w *Wifi) HasInternet() (ok bool) {
 	client := &http.Client{
-		Timeout: 3 * time.Second,
+		Timeout: 5 * time.Second,
 	}
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -105,6 +105,7 @@ func (w *Wifi) HasInternet() (ok bool) {
 		return false
 	}
 	if _, err = client.Do(req); err != nil {
+		fmt.Println(err)
 		return false
 	}
 	return true
