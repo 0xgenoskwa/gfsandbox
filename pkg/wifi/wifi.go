@@ -91,9 +91,12 @@ func (w *Wifi) Connect(ssid, psk string) ([]byte, error) {
 }
 
 func (w *Wifi) HasInternet() (ok bool) {
+	fmt.Println("HasInternet start")
 	if _, err := http.Get("http://clients3.google.com/generate_204"); err != nil {
+		fmt.Println("HasIntenet end with false")
 		return false
 	}
+	fmt.Println("HasInternet end with true")
 	return true
 }
 
