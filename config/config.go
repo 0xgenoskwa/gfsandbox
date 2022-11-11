@@ -18,7 +18,7 @@ type Config struct {
 	Version string `json:"-"`
 	Build   string `json:"-"`
 
-	Changed chan bool
+	changed chan bool
 
 	DeviceName   string `json:"device_name"`
 	WifiSsid     string `json:"wifi_ssid"`
@@ -90,7 +90,7 @@ func (c *Config) SaveConfig() error {
 		return err
 	}
 
-	c.Changed <- true
+	c.changed <- true
 
 	return nil
 }
@@ -101,4 +101,8 @@ func (c *Config) HasMqttConfig() bool {
 	}
 
 	return false
+}
+
+func (c *Config) Changed() chan bool {
+	return c.changed
 }

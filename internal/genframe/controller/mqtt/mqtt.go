@@ -59,7 +59,7 @@ func (m *Mqtt) Start() error {
 	m.Client = client
 
 	go func() {
-		<-m.Config.Changed
+		<-m.Config.Changed()
 		m.Shutdown()
 		m.Start()
 	}()
