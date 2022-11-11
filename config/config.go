@@ -46,8 +46,9 @@ func (c *Config) LoadConfig() error {
 	fmt.Println("Load config", c.Path)
 	if _, err := os.Stat(c.Path); os.IsNotExist(err) {
 		fmt.Println("Load config is not existed path", c.Path)
-		if err := c.SaveConfig(); err != nil {
-			return err
+		if serr := c.SaveConfig(); serr != nil {
+			fmt.Println("c.SaveConfig has err???", serr)
+			return serr
 		}
 	}
 	fmt.Println("Load config existed path", c.Path)
