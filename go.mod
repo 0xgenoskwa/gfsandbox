@@ -9,6 +9,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/google/wire v0.5.0
 	github.com/jaypipes/ghw v0.9.0
+	github.com/mailru/easyjson v0.7.7
 	tinygo.org/x/bluetooth v0.6.0
 )
 
@@ -24,7 +25,6 @@ require (
 	github.com/godbus/dbus/v5 v5.0.3 // indirect
 	github.com/jaypipes/pcidb v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/muka/go-bluetooth v0.0.0-20220830075246-0746e3a1ea53 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

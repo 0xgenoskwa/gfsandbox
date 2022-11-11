@@ -1,32 +1,34 @@
 # This how we want to name the binary output
 BINARY=genframe
+AUTOUPDATER_BINARY=autoupdater
+BOOTSTRAP_BINARY=bootstrap
 
 REPO=github.com/0xgenoskwa/gfsandbox
 
 # These are the values we want to pass for VERSION and BUILD
 GENFRAME_VERSION:=1.0.0
 AUTOUPDATER_VERSION:=1.0.0
-AUTORECOVER_VERSION:=1.0.0
+BOOTSTRAP_VERSION:=1.0.0
 TAG:=${shell git rev-parse --short HEAD}
 BUILD:=${shell date +%FT%T%z}
 
 # Setup the -ldflags option for go build here, interpolate the variable values
 GENFRAME_LDFLAGS=-ldflags "-X ${REPO}/config.Version=${GENFRAME_VERSION}-${TAG} -X ${REPO}/config.Build=${BUILD}"
 AUTOUPDAER_LDFLAGS=-ldflags "-X ${REPO}/config.Version=${GENFRAME_VERSION}-${TAG} -X ${REPO}/config.Build=${BUILD}"
-AUTORECOVER_LDFLAGS=-ldflags "-X ${REPO}/config.Version=${GENFRAME_VERSION}-${TAG} -X ${REPO}/config.Build=${BUILD}"
+BOOTSTRAP_LDFLAGS=-ldflags "-X ${REPO}/config.Version=${GENFRAME_VERSION}-${TAG} -X ${REPO}/config.Build=${BUILD}"
 
 generate:
 	GOFLAGS=-mod=mod go generate ./...
 
 # Builds the project
 build-genframe:
-	GOOS=linux GOARCH=amd64 go build ${GENFRAME_LDFLAGS} -o ${BINARY}-v${GENFRAME_VERSION} cmd/genframe/main.go
+	GOOS=linux GOARCH=amd64 go build ${GENFRAME_LDFLAGS} -o ${BINARY} cmd/genframe/main.go
 
 build-autoupdater:
-	GOOS=linux GOARCH=amd64 go build ${AUTOUPDAER_LDFLAGS} -o ${BINARY}-v${AUTOUPDATER_VERSION} cmd/autoupdater/main.go
+	go build ${AUTOUPDAER_LDFLAGS} -o ${AUTOUPDATER_BINARY} cmd/autoupdater/main.go
 
-build-autorecover:
-	GOOS=linux GOARCH=amd64 go build ${AUTORECOVER_LDFLAGS} -o ${BINARY}-v${AUTORECOVER_VERSION} cmd/autorecover/main.go
+build-bootstrap:
+	go build ${BOOTSTRAP_LDFLAGS} -o ${BOOTSTRAP_BINARY} cmd/bootstrap/main.go
 
 test:
 	go test ./...  -count=1 -cover -race

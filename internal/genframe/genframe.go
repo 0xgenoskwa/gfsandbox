@@ -42,7 +42,6 @@ func ProvideGenframe(c *config.Config, w *wifi.Wifi, chr *chrome.Chrome, u *usec
 }
 
 func (g *Genframe) Run() {
-	fmt.Println("genframe Chrome run 1")
 	ctx := context.Background()
 
 	cancel, err := g.Chrome.Init(ctx)

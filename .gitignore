@@ -1,3 +1,5 @@
-genframe-*
+/genframe
+/bootstrap
+/autoupdater
 
 config.json
