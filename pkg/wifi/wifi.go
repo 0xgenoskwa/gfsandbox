@@ -93,7 +93,9 @@ func (w *Wifi) Connect(ssid, psk string) ([]byte, error) {
 
 func (w *Wifi) HasInternet() (ok bool) {
 	fmt.Println("HasInternet start")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 3 * time.Second,
+	}
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
@@ -104,7 +106,7 @@ func (w *Wifi) HasInternet() (ok bool) {
 		return false
 	}
 	_, err = client.Do(req)
-	if err != nil && strings.HasSuffix(strings.ToLower(err.Error()), "no such host") {
+	if err != nil {
 		fmt.Println("HasInternet return false")
 		return false
 	}
