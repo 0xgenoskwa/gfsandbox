@@ -123,6 +123,6 @@ func (w *Wifi) StartWifiMonitoring() {
 	}
 }
 
-func (w *Wifi) Signal() chan bool {
+func (w *Wifi) Signal() <-chan bool {
 	return w.signal
 }
