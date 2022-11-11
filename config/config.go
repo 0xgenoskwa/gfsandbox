@@ -43,11 +43,14 @@ func ProvideConfig() *Config {
 }
 
 func (c *Config) LoadConfig() error {
+	fmt.Println("Load config", c.Path)
 	if _, err := os.Stat(c.Path); os.IsNotExist(err) {
+		fmt.Println("Load config is not existed path", c.Path)
 		if err := c.SaveConfig(); err != nil {
 			return err
 		}
 	}
+	fmt.Println("Load config existed path", c.Path)
 	jsonFile, err := os.Open(c.Path)
 	// if we os.Open returns an error then handle it
 	if err != nil {
@@ -57,12 +60,11 @@ func (c *Config) LoadConfig() error {
 	defer jsonFile.Close()
 
 	bytes, _ := io.ReadAll(jsonFile)
-
 	err = json.Unmarshal(bytes, c)
 	if err != nil {
 		return err
 	}
-
+	fmt.Println("Load config existed path end")
 	return nil
 }
 
