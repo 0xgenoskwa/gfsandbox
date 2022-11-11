@@ -3,6 +3,7 @@ package wifi
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -10,6 +11,9 @@ import (
 )
 
 type Wifi struct {
+	signal chan bool
+
+	monitoring chan bool
 }
 
 func ProvideWifi() *Wifi {
@@ -91,4 +95,41 @@ func (w *Wifi) HasInternet() (ok bool) {
 		return false
 	}
 	return true
+}
+
+func (w *Wifi) StartWifiMonitoring() {
+	fmt.Println("Wifi monitoring start")
+	noConnCount := 0
+	state := false
+	for {
+		select {
+		case <-w.monitoring:
+			return
+		default:
+			if w.HasInternet() {
+				noConnCount = 0
+				if !state {
+					state = true
+					w.signal <- state
+				}
+			} else {
+				noConnCount = noConnCount + 1
+				if noConnCount > 3 {
+					state = false
+					w.signal <- state
+				}
+			}
+
+			time.Sleep(2 * time.Second)
+		}
+	}
+}
+
+func (w *Wifi) StopWifiMonitoring() {
+	fmt.Println("Wifi monitoring stop")
+	w.monitoring <- true
+}
+
+func (w *Wifi) Signal() chan bool {
+	return w.signal
 }

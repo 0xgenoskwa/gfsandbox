@@ -42,6 +42,7 @@ func ProvideMQTT(c *config.Config, u *usecase.Usecase, chr *chrome.Chrome) *Mqtt
 }
 
 func (m *Mqtt) Start() error {
+	fmt.Println("Mqtt start")
 	opts := mqtt.NewClientOptions()
 	mqttUri := fmt.Sprintf("%s:%d", m.Config.MqttUrl, m.Config.MqttPort)
 	opts.AddBroker(mqttUri)
@@ -186,6 +187,7 @@ func (m *Mqtt) Notify() <-chan error {
 
 // Shutdown -.
 func (m *Mqtt) Shutdown() error {
+	fmt.Println("Mqtt stop")
 	m.Client.Disconnect(1000)
 	return nil
 }

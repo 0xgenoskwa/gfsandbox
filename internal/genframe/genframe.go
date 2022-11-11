@@ -51,15 +51,42 @@ func (g *Genframe) Run() {
 	defer cancel()
 	// open html
 	g.Chrome.OpenHtml()
+	if g.Config.ServingUrl != "" {
+		g.Chrome.OpenUrl(g.Config.ServingUrl)
+	}
+
+	go g.Wifi.StartWifiMonitoring()
+	defer g.Wifi.StopWifiMonitoring()
 
 	// start bluetooth
 	if err := g.BluetoothHandler.Start(); err != nil {
 		panic(err)
 	}
+
 	// start mqtt
-	if err := g.MqttHandler.Start(); err != nil {
-		panic(err)
+	startedMqtt := false
+	if g.Wifi.HasInternet() && g.Config.HasMqttConfig() {
+		if err := g.MqttHandler.Start(); err != nil {
+			panic(err)
+		}
+		startedMqtt = true
 	}
+
+	// monitoring network logic
+	go func() {
+		for status := range g.Wifi.Signal() {
+			if status && g.Config.HasMqttConfig() && !startedMqtt {
+				if err := g.MqttHandler.Start(); err != nil {
+					panic(err)
+				}
+				startedMqtt = true
+			}
+			if !status && startedMqtt {
+				g.MqttHandler.Shutdown()
+				startedMqtt = false
+			}
+		}
+	}()
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)

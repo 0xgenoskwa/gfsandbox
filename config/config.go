@@ -94,3 +94,11 @@ func (c *Config) SaveConfig() error {
 
 	return nil
 }
+
+func (c *Config) HasMqttConfig() bool {
+	if c.MqttUrl != "" && c.MqttPort > 0 {
+		return true
+	}
+
+	return false
+}
