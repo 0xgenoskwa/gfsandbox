@@ -44,6 +44,10 @@ func ProvideGenframe(c *config.Config, w *wifi.Wifi, chr *chrome.Chrome, u *usec
 func (g *Genframe) Run() {
 	ctx := context.Background()
 
+	if err := g.Config.LoadConfig(); err != nil {
+		panic(err)
+	}
+
 	cancel, err := g.Chrome.Init(ctx)
 	if err != nil {
 		panic(err)

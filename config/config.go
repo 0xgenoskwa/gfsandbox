@@ -38,9 +38,6 @@ func ProvideConfig() *Config {
 		Version: Version,
 		Build:   Build,
 	}
-	if err := c.LoadConfig(); err != nil {
-		panic(err)
-	}
 
 	return &c
 }
