@@ -50,6 +50,12 @@ func (m *Mqtt) Start() error {
 	opts.AddBroker(mqttUri)
 	opts.SetClientID(m.Config.DeviceName)
 	opts.SetDefaultPublishHandler(m.onReceiveMessage)
+	if m.Config.MqttUsername != "" {
+		opts.SetUsername(m.Config.MqttUsername)
+	}
+	if m.Config.MqttPassword != "" {
+		opts.SetPassword(m.Config.MqttPassword)
+	}
 	opts.OnConnect = m.ConnectHandler
 	opts.OnConnectionLost = m.ConnectLostHandler
 
