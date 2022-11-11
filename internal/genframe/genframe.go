@@ -113,7 +113,7 @@ func (g *Genframe) Run() {
 		fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Notify: %w", err))
 	}
 
-	<-quitMonitoring
+	quitMonitoring <- true
 
 	if g.BluetoothHandler.Started {
 		if err := g.BluetoothHandler.Shutdown(); err != nil {
