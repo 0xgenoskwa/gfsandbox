@@ -104,6 +104,7 @@ func (w *Wifi) StartWifiMonitoring() {
 	for {
 		select {
 		case <-w.monitoring:
+			fmt.Println("stop monitoring")
 			return
 		default:
 			if w.HasInternet() {

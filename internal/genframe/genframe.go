@@ -75,8 +75,11 @@ func (g *Genframe) Run() {
 	}
 
 	// monitoring network logic
+	quitMonitoring := make(chan bool)
 	go func() {
 		select {
+		case <-quitMonitoring:
+			return
 		case status := <-g.Wifi.Signal():
 			if status && g.Config.HasMqttConfig() && !g.MqttHandler.Started {
 				if err := g.MqttHandler.Start(); err != nil {
@@ -110,6 +113,8 @@ func (g *Genframe) Run() {
 		fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Notify: %w", err))
 	}
 
+	<-quitMonitoring
+
 	if g.BluetoothHandler.Started {
 		if err := g.BluetoothHandler.Shutdown(); err != nil {
 			fmt.Println(fmt.Errorf("app - Run - g.BluetoothHandler.Shutdown: %w", err))
@@ -121,5 +126,4 @@ func (g *Genframe) Run() {
 			fmt.Println(fmt.Errorf("app - Run - g.MqttHandler.Shutdown: %w", err))
 		}
 	}
-
 }
