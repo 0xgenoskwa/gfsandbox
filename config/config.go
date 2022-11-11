@@ -18,7 +18,7 @@ type Config struct {
 	Version string `json:"-"`
 	Build   string `json:"-"`
 
-	changed chan bool
+	changed chan bool `json:"-"`
 
 	DeviceName   string `json:"device_name"`
 	WifiSsid     string `json:"wifi_ssid"`
