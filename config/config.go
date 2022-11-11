@@ -96,6 +96,6 @@ func (c *Config) HasMqttConfig() bool {
 	return false
 }
 
-func (c *Config) Changed() chan bool {
+func (c *Config) Changed() <-chan bool {
 	return c.changed
 }
